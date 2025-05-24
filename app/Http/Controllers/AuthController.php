@@ -2,13 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\RegisterRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Helpers\MyHelper;
-use App\Http\Requests\LoginRequest;
 
 class AuthController extends Controller
 {
@@ -17,14 +15,20 @@ class AuthController extends Controller
         return view('auth.register');
     }
 
-    public function register(RegisterRequest $request)
+    public function register(Request $request)
     {
+        $request->validate([
+            'name' => 'required|string',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required'
+        ]);
+
         $user = new User();
         $user->name = $request->name;
         $user->email = $request->email;
         $user->password = Hash::make($request->password);
         $user->save();
-        return redirect()->route('login.view')->with('success', 'Berhasil register, silahkan login');
+        return redirect()->route('login.view');
     }
 
     public function loginView()
@@ -32,16 +36,19 @@ class AuthController extends Controller
         return view('auth.login');
     }
 
-    public function login(LoginRequest $request)
+    public function login(Request $request)
     {
-        $credentials = $request->validated();
+        $credentials = $request->validate([
+            'email' => 'required|email',
+            'password' => 'required'
+        ]);
 
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
                 return redirect('/');
         }
 
-        return back()->with('error', 'Email atau password mungkin ada yang salah');
+        return back();
     }
 
     public function logout(Request $request)

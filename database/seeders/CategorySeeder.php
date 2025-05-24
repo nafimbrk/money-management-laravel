@@ -14,9 +14,19 @@ class CategorySeeder extends Seeder
      */
     public function run(): void
     {
-        Category::create([
-            'name' => 'Jajan',
-            'type' => 'expense',
-        ]);
+        $data = [
+            [
+                'name' => 'Gaji',
+                'type' => 'income'
+            ],
+            [
+                'name' => 'Jajan',
+                'type' => 'expense'
+            ]
+            ];
+
+            foreach ($data as $dt) {
+                Category::create($dt);
+            }
     }
 }
